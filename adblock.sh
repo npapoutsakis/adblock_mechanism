@@ -79,15 +79,15 @@ function adBlock() {
         
     elif [ "$1" = "-reset"  ]; then
         # Reset rules to default settings (i.e. accept all).
-        # iptables -P INPUT ACCEPT
-        # iptables -P FORWARD ACCEPT
-        # iptables -P OUTPUT ACCEPT
+        
+        # Change the policy? -> it will be flushed so nop
+        iptables -P INPUT ACCEPT
+        iptables -P FORWARD ACCEPT
+        iptables -P OUTPUT ACCEPT
 
         # -F flush chain
         iptables -F
 
-        # -X delete chain
-        # iptables -X
         # rm IPAddressesSame.txt IPAddressesDifferent.txt
         true
   
