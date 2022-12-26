@@ -15,22 +15,56 @@ function adBlock() {
         # Find different and same domains in ‘domainNames.txt’ and ‘domainsNames2.txt’ files 
         # and write them in “IPAddressesDifferent.txt and IPAddressesSame.txt" respectively
 
+        # Store common urls in variable
+        same_domains=`grep -f domainNames.txt domainNames2.txt`
+
+        # Get the ips of the same domains and store them in IPAddressesSame
+        while read line1 || [ -n "$line1" ];
+        do 
+            dig +short $line1 | grep '^[.0-9]*$' >> $IPAddressesSame
+      
+        done <<< "$same_domains"
+
+        # Store the domains that differ
+        unique_domains=`sort domainNames.txt domainNames2.txt | uniq -u`
+
+        # Get the ips of the different domains and store them in IPAddressesDifferent
+        while read line2 || [ -n "$line2" ];
+        do 
+            dig +short $line2 | grep '^[.0-9]*$' >> $IPAddressesDifferent
+      
+        done <<< "$unique_domains"       
 
         true
             
     elif [ "$1" = "-ipssame"  ]; then
         # Configure the DROP adblock rule based on the IP addresses of $IPAddressesSame file.
-        # Write your code here...
-
-
+        
+        # iptables -A [chain] -p [protocol] -s [source IP] --dport [destination port] -j DROP
+        while read -r line || [ -n "$line" ];
+        do 
+            if [ "$line" != "" ]; then
+                iptables -A INPUT -s $line -j DROP
+                iptables -A FORWARD -s $line -j DROP
+                iptables -A OUTPUT -s $line -j DROP
+            fi
+        done < $IPAddressesSame
 
         true
-        
+
     elif [ "$1" = "-ipsdiff"  ]; then
         # Configure the REJECT adblock rule based on the IP addresses of $IPAddressesDifferent file.
-        # Write your code here...
-        # ...
-        # ...
+        
+        # iptables -A [chain] -p [protocol] -s [source IP] --dport [destination port] -j DROP
+        while read -r line || [ -n "$line" ];
+        do 
+            if [ "$line" != "" ]; then
+                iptables -A INPUT -s $line -j REJECT
+                iptables -A FORWARD -s $line -j REJECT
+                iptables -A OUTPUT -s $line -j REJECT
+            fi
+        done < $IPAddressesDifferent
+
         true
         
     elif [ "$1" = "-save"  ]; then
@@ -45,8 +79,16 @@ function adBlock() {
         
     elif [ "$1" = "-reset"  ]; then
         # Reset rules to default settings (i.e. accept all).
-        # Write your code here...
-        rm IPAddressesSame.txt
+        # iptables -P INPUT ACCEPT
+        # iptables -P FORWARD ACCEPT
+        # iptables -P OUTPUT ACCEPT
+
+        # -F flush chain
+        iptables -F
+
+        # -X delete chain
+        # iptables -X
+        # rm IPAddressesSame.txt IPAddressesDifferent.txt
         true
   
     elif [ "$1" = "-list"  ]; then
