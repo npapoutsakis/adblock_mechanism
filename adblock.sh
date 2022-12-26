@@ -25,6 +25,7 @@ function adBlock() {
 
 
         true
+        
     elif [ "$1" = "-ipsdiff"  ]; then
         # Configure the REJECT adblock rule based on the IP addresses of $IPAddressesDifferent file.
         # Write your code here...
@@ -34,34 +35,26 @@ function adBlock() {
         
     elif [ "$1" = "-save"  ]; then
         # Save rules to $adblockRules file.
-        # Write your code here...
-        # ...
-        # ...
-
+        iptables-save > $adblockRules
         true
         
     elif [ "$1" = "-load"  ]; then
         # Load rules from $adblockRules file.
-        # Write your code here...
-        # ...
-        # ...
+        iptables-restore < $adblockRules
         true
-
         
     elif [ "$1" = "-reset"  ]; then
         # Reset rules to default settings (i.e. accept all).
         # Write your code here...
-
         rm IPAddressesSame.txt
-
         true
-
-        
+  
     elif [ "$1" = "-list"  ]; then
         # List current rules.
-        # Write your code here...
-        # ...
-        # ...
+        # --list flag shows all the rules in the chain
+        # --line numbers used to specify each line 
+        # --numeric to print IPs and ports in numeric format
+        iptables --list --line-numbers --numeric
         true
         
     elif [ "$1" = "-help"  ]; then
@@ -69,8 +62,8 @@ function adBlock() {
         printf "Usage: $0  [OPTION]\n\n"
         printf "Options:\n\n"
         printf "  -domains\t  Configure adblock rules based on the domain names of '$domainNames' file.\n"
-        printf "  -ipssame\t  Configure the DROP adblock rule based on the IP addresses of $IPAddressesSame file.\n"
-	    printf "  -ipsdiff\t  Configure the DROP adblock rule based on the IP addresses of $IPAddressesDifferent file.\n"
+        printf "  -ipssame\t  Configure the DROP adblock rules based on the IP addresses of $IPAddressesSame file.\n"
+	    printf "  -ipsdiff\t  Configure the REJECT adblock rules based on the IP addresses of $IPAddressesDifferent file.\n"
         printf "  -save\t\t  Save rules to '$adblockRules' file.\n"
         printf "  -load\t\t  Load rules from '$adblockRules' file.\n"
         printf "  -list\t\t  List current rules.\n"
