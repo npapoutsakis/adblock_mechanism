@@ -46,13 +46,13 @@ function adBlock() {
             if [ "$line" != "" ]; then
                 iptables -A INPUT -s $line -j DROP
                 iptables -A FORWARD -s $line -j DROP
-                iptables -A OUTPUT -s $line -j DROP
+                iptables -A OUTPUT -d $line -j DROP
             fi
         done < $IPAddressesSame
 
         true
 
-    elif [ "$1" = "-ipsdiff"  ]; then
+    elif [ "$1" = "-ipsdiff"  ]; then 
         # Configure the REJECT adblock rule based on the IP addresses of $IPAddressesDifferent file.
         
         # iptables -A [chain] -p [protocol] -s [source IP] --dport [destination port] -j DROP
@@ -61,7 +61,7 @@ function adBlock() {
             if [ "$line" != "" ]; then
                 iptables -A INPUT -s $line -j REJECT
                 iptables -A FORWARD -s $line -j REJECT
-                iptables -A OUTPUT -s $line -j REJECT
+                iptables -A OUTPUT -d $line -j REJECT
             fi
         done < $IPAddressesDifferent
 
@@ -77,7 +77,7 @@ function adBlock() {
         iptables-restore < $adblockRules
         true
         
-    elif [ "$1" = "-reset"  ]; then
+    elif [ "$1" = "-reset" ]; then
         # Reset rules to default settings (i.e. accept all).
         
         # Change the policy? -> it will be flushed so nop
